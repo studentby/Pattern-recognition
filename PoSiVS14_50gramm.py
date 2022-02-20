@@ -9,7 +9,7 @@ from skimage.color import rgb2gray
 from skimage.filters import gaussian
 from skimage.segmentation import active_contour
 from skimage.measure import find_contours, approximate_polygon
-from skimage import color, morphology
+from skimage import color, morphology, feature
 import numpy as np
 
 original_image = Image.open("/home/ububntu/Desktop/Diploma/PoSi/14_50gramm.jpg")
@@ -34,10 +34,8 @@ c = 841 + 200*np.sin(s) # y - coordinate
 init = np.array([r, c]).T
 
 
-
 # snake = active_contour(gaussian(grayscale_image, 3, preserve_range=False),
 #                        init, alpha=0.015, beta=10, gamma=0.001)
-
 
 # Showing made changes on Plot and comparing with Original 
 fig, axes = plt.subplots(1, 2, figsize=(8, 4))
@@ -55,9 +53,11 @@ for contour in contours:
 footprint_1 = morphology.disk(2)
 res_1 = morphology.white_tophat(grayscale_image_1,footprint_1)
 
+edges = feature.canny(grayscale_image - res)
+edges1 = feature.canny(grayscale_image_1 - res_1)
 
-ax[1].imshow(grayscale_image - res, cmap=plt.cm.gray)
-ax[0].imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
+ax[1].imshow(edges, cmap=plt.cm.gray)
+ax[0].imshow(edges1, cmap=plt.cm.gray)
 # ax[1].plot(init[:, 1], init[:, 0], '--r', lw=3)
 # ax[1].plot(snake[:, 1], snake[:, 0], '-b', lw=3)
 
@@ -99,7 +99,7 @@ for i in range(len(coordinates_1)):
 
 contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
 for contour in contours_1:
-    ax[0].plot(contour[:, 1], contour[:, 0], linewidth = 3) 
+    ax[0].plot(contour[:, 1], contour[:, 0], linewidth = 3)
 
 fig.tight_layout()
 plt.show()
