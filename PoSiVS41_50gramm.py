@@ -12,9 +12,9 @@ from skimage.measure import find_contours, approximate_polygon
 from skimage import color, morphology
 import numpy as np
 
-# Local paths to images
-original_image = Image.open("/home/ububntu/Desktop/Diploma/PoSi/41_50gramm.jpg")
-original_image_1 = Image.open("/home/ububntu/Desktop/Diploma/PoSi/PoSi.jpg")
+# Local path to file
+# original_image = Image.open("/home/ububntu/Desktop/Diploma/PoSi/41_50gramm.jpg")
+# original_image_1 = Image.open("/home/ububntu/Desktop/Diploma/PoSi/PoSi.jpg")
 
 # im.convert('L')
 
