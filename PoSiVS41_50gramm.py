@@ -29,17 +29,6 @@ npImage1 = Image.fromarray(im1_array, 'RGB')
 grayscale_image = rgb2gray(original_image)
 grayscale_image_1 = rgb2gray(original_image_1)
 
-# s = np.linspace(0, 2 * np.pi, 400)
-# r =  568 + 200*np.cos(s) # x -coordinate
-# c = 841 + 200*np.sin(s) # y - coordinate
-# init = np.array([r, c]).T
-
-
-
-# snake = active_contour(gaussian(grayscale_image, 3, preserve_range=False),
-#                        init, alpha=0.015, beta=10, gamma=0.001)
-
-
 # Showing made changes on Plot and comparing with Original 
 fig, axes = plt.subplots(1, 2, figsize=(8, 4))
 ax = axes.ravel()
@@ -52,16 +41,11 @@ contours = find_contours(grayscale_image - res, fully_connected='low')
 for contour in contours:
     ax[1].plot(contour[:, 1], contour[:, 0], linewidth = 1)  
 
-
 footprint_1 = morphology.disk(2)
 res_1 = morphology.white_tophat(grayscale_image_1,footprint_1)
 
-
 ax[1].imshow(grayscale_image - res, cmap=plt.cm.gray)
 ax[0].imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
-# ax[1].plot(init[:, 1], init[:, 0], '--r', lw=3)
-# ax[1].plot(snake[:, 1], snake[:, 0], '-b', lw=3)
-
 
 ax[0].set_xticks([]), ax[0].set_yticks([])
 ax[1].set_xticks([]), ax[1].set_yticks([])
@@ -90,7 +74,6 @@ coordinates_1 = np.array(
     line(1769, 1116, 1812, 1154),
     line(1812, 1154, 1769, 1191)],
     dtype=list)
-
 
 
 for i in range(len(coordinates_1)):
