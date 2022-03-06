@@ -12,8 +12,8 @@ from skimage.measure import find_contours, approximate_polygon
 from skimage import color, morphology
 import numpy as np
 
-original_image = Image.open("/home/ububntu/Desktop/Diploma/Pi/Pi50.jpg")
-original_image_1 = Image.open("/home/ububntu/Desktop/Diploma/PiSi/PiSi50.jpg")
+original_image = Image.open("Pi/Pi50.jpg")
+original_image_1 = Image.open("PiSi/PiSi50.jpg")
 
 # im.convert('L')
 

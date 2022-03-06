@@ -13,8 +13,8 @@ from skimage import color, morphology
 import numpy as np
 
 # Local path to file
-# original_image = Image.open("/home/ububntu/Desktop/Diploma/PoSi/41_50gramm.jpg")
-# original_image_1 = Image.open("/home/ububntu/Desktop/Diploma/PoSi/PoSi.jpg")
+original_image = Image.open("PoSi/41_50gramm.jpg")
+original_image_1 = Image.open("PoSi/PoSi.jpg")
 
 # im.convert('L')
 
