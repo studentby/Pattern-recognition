@@ -17,7 +17,6 @@ original_image = Image.open("PoSi/41_50gramm.jpg")
 original_image_1 = Image.open("PoSi/PoSi.jpg")
 
 # im.convert('L')
-
 im_array = np.array(original_image)
 im1_array = np.array(original_image_1)
 
