@@ -1,14 +1,16 @@
+from email.mime import image
 import matplotlib.pyplot as plt
 import time
 from tkinter import Image
 from PIL import Image
 from pyparsing import line_end
 from skimage.draw import line
+import cv2
 
 from skimage.color import rgb2gray
 from skimage.filters import gaussian
 from skimage.segmentation import active_contour
-from skimage.measure import find_contours, approximate_polygon
+from skimage.measure import find_contours, approximate_polygon, perimeter
 from skimage.future import graph
 from skimage import color, morphology, feature, segmentation, filters, io
 import numpy as np
@@ -48,12 +50,12 @@ def main():
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
 
     # Detecting Edges 
-    edges = feature.canny(grayscale_image, sigma = 5)
-    edges1 = feature.canny(grayscale_image_1,sigma = 5)
+    # edges = feature.canny(grayscale_image, sigma = 5)
+    # edges1 = feature.canny(grayscale_image_1,sigma = 5)
 
     # Image rendition
-    ax[1].imshow(edges, cmap=plt.cm.gray)
-    ax[0].imshow(edges1, cmap=plt.cm.gray)
+    ax[1].imshow(grayscale_image, cmap=plt.cm.gray)
+    ax[0].imshow(grayscale_image_1, cmap=plt.cm.gray)
 
 
     ax[0].set_xticks([]), ax[0].set_yticks([])
@@ -93,17 +95,27 @@ def main():
         ax[0].plot(line_draw_1[:, 0],line_draw_1[:, 1],'--w', lw = 1)
 
     contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
+    
     for contour in contours_1:
-        coords = approximate_polygon(contour, tolerance = 30)
+        coords = approximate_polygon(contour, tolerance = 40)
         ax[0].plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
         ax[0].plot(contour[:, 1], contour[:, 0], linewidth = 2)
-    
+        if len(coords) == 4:
+            print(len(coords))
+            print(coords)
+            c = np.expand_dims(coords.astype(np.float32), 1)
+            # Convert it to UMat object
+            c = cv2.UMat(c)
+            area = cv2.contourArea(c)
+            print(area)
+        
+        
     fig.tight_layout()
 
 if __name__=="__main__":
     start_time = time.time()
     main()
     print("---Execution %s seconds ---" % round(time.time() - start_time))
-    plt.show()
+    # plt.show()
     
 # npImage.save('/home/ububntu/Desktop/Diploma/squrePatterns/image_test.png')
