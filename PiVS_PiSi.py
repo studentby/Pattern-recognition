@@ -52,7 +52,7 @@ def main():
     edges1 = feature.canny(grayscale_image_1 - res_1, sigma = 2)
 
     # Image rendition
-    ax[1].imshow(edges, cmap=plt.cm.gray)
+    ax[1].imshow(grayscale_image - res, cmap=plt.cm.gray)
     ax[0].imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
 
 
