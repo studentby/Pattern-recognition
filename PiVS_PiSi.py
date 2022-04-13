@@ -33,54 +33,51 @@ def main():
     grayscale_image_1 = rgb2gray(original_image_1)
 
     # Showing made changes on Plot and comparing with Original 
-    fig, axes = plt.subplots(1, 2, figsize=(8, 4))
-    ax = axes.ravel()
+    fig, ax = plt.subplots(figsize=(8, 4))
 
-    # Show conturus on picture
-    footprint = morphology.disk(10)
-    res = morphology.white_tophat(grayscale_image,footprint)
-
-    contours = find_contours(grayscale_image - res, fully_connected='high')
-    for contour in contours:
-        ax[1].plot(contour[:, 1], contour[:, 0], linewidth = 1)  
-
+    # Removal of small objects from Image
     footprint_1 = morphology.disk(5)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
 
     # Detecting Edges 
-    edges = feature.canny(grayscale_image - res, sigma = 1)
     edges1 = feature.canny(grayscale_image_1 - res_1, sigma = 2)
 
     # Image rendition
-    ax[1].imshow(grayscale_image - res, cmap=plt.cm.gray)
-    ax[0].imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
+    ax.imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
 
-
-    ax[0].set_xticks([]), ax[0].set_yticks([])
-    ax[1].set_xticks([]), ax[1].set_yticks([])
-
-    ax[1].axis([0, grayscale_image.shape[1], grayscale_image.shape[0], 0])
-
-    ax[1].set_title("№14 50 gramm pressure", fontsize = 20)
-    ax[0].set_title("PolySi", fontsize = 20)
+    ax.set_xticks([]), ax.set_yticks([])
+    ax.set_title("PiSi", fontsize = 20)
 
     contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
 
     for contour in contours_1:
         coords = approximate_polygon(contour, tolerance = 60)
-        ax[0].plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
-        ax[0].plot(contour[:, 1], contour[:, 0], linewidth = 2)
-        if len(coords) == 4:
+        ax.plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
+        ax.plot(contour[:, 1], contour[:, 0], linewidth = 2)
+        if len(coords) == 5:
             print(coords)
             # coords[x][y]
-            print(math.sqrt(math.pow(coords[0][0]-coords[2][0],2) + math.pow(coords[0][1]-coords[2][1], 2)))
-            print(math.sqrt(math.pow(coords[1][0]-coords[3][0],2) + math.pow(coords[1][1]-coords[3][1], 2)))
+
+            #Dioganals of squares
+            diogan_1 = math.sqrt(math.pow(coords[0][0]-coords[2][0],2) + math.pow(coords[0][1]-coords[2][1], 2))
+            diogan_2 = math.sqrt(math.pow(coords[1][0]-coords[3][0],2) + math.pow(coords[1][1]-coords[3][1], 2))
             
+            # Scale 6mm around 833 pixels
+            scale = 833
+
+            # Scale length in mm
+            scale_length = 6
+
+            # Rounding with two decimals
+            print("First dioganal: " + str(round(diogan_1/scale*scale_length, 2)))
+            print("Second dioganal: " + str(round(diogan_2/scale*scale_length, 2)))
+            
+
             c = np.expand_dims(coords.astype(np.float32), 1)
             # Convert it to UMat object
             c = cv2.UMat(c)
             area = cv2.contourArea(c)
-            # print(area)
+            print("Area of contour: " + str(area))
         
         
     fig.tight_layout()
