@@ -46,7 +46,7 @@ def main():
     ax.imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
-    ax.set_title("PiSi", fontsize = 20)
+    ax.set_title("Polyimide Silicium", fontsize = 20)
 
     contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
 
