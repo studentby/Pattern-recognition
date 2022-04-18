@@ -50,6 +50,8 @@ def main():
 
     contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
 
+    area_list = []
+
     for contour in contours_1:
         coords = approximate_polygon(contour, tolerance = 60)
         ax.plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
@@ -69,16 +71,24 @@ def main():
             scale_length = 6
 
             # Rounding with two decimals
-            print("First dioganal: " + str(round(diogan_1/scale*scale_length, 2)))
-            print("Second dioganal: " + str(round(diogan_2/scale*scale_length, 2)))
-            
+            scaled_diogan_1 = diogan_1/scale*scale_length
+            scaled_diogan_2 = diogan_2/scale*scale_length
 
-            c = np.expand_dims(coords.astype(np.float32), 1)
-            # Convert it to UMat object
-            c = cv2.UMat(c)
-            area = cv2.contourArea(c)
-            print("Area of contour: " + str(area))
-        
+            # Area by diogonals and diveded by two
+            area = scaled_diogan_1*scaled_diogan_1/2
+            print("First dioganal: " + str(round(scaled_diogan_1, 2)))
+            print("Second dioganal: " + str(round(scaled_diogan_2, 2)))
+            
+            # Contour area
+            # c = np.expand_dims(coords.astype(np.float32), 1)
+            # # Convert it to UMat object 
+            # c = cv2.UMat(c)
+            # area = cv2.contourArea(c)
+            # print("Area of contour: " + str(area))
+            area_list.append(area)
+    print(area_list)
+    area_diff = str(abs(area_list[0]-area_list[1]))
+    print(area_diff + "mm2 - Area Differnce" )
         
     fig.tight_layout()
 
