@@ -1,4 +1,3 @@
-from email.mime import image
 import matplotlib.pyplot as plt
 import time
 from tkinter import Image
@@ -18,18 +17,10 @@ import numpy as np
 
 
 def main():
-    original_image = Image.open("Pi/Pi50.jpg")
+
     original_image_1 = Image.open("PiSi/PiSi50.jpg")
 
-    im_array = np.array(original_image)
-    im1_array = np.array(original_image_1)
-
-    # Image saved in numPy array
-    npImage = Image.fromarray(im_array, 'RGB')
-    npImage1 = Image.fromarray(im1_array, 'RGB')
-
     # Grayscaling and comparison of original image in MatPlot Lib 
-    grayscale_image = rgb2gray(original_image)
     grayscale_image_1 = rgb2gray(original_image_1)
 
     # Showing made changes on Plot and comparing with Original 
@@ -39,14 +30,11 @@ def main():
     footprint_1 = morphology.disk(5)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
 
-    # Detecting Edges 
-    edges1 = feature.canny(grayscale_image_1 - res_1, sigma = 2)
-
     # Image rendition
     ax.imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
-    ax.set_title("Polyimide Silicium", fontsize = 20)
+    ax.set_title("Polyimide Silicium 50 gramm pressure", fontsize = 20)
 
     contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
 
@@ -57,10 +45,8 @@ def main():
         ax.plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
         ax.plot(contour[:, 1], contour[:, 0], linewidth = 2)
         if len(coords) == 5:
-            print(coords)
-            # coords[x][y]
-
-            #Dioganals of squares
+            
+            # Dioganals of squares
             diogan_1 = math.sqrt(math.pow(coords[0][0]-coords[2][0],2) + math.pow(coords[0][1]-coords[2][1], 2))
             diogan_2 = math.sqrt(math.pow(coords[1][0]-coords[3][0],2) + math.pow(coords[1][1]-coords[3][1], 2))
             
@@ -79,14 +65,7 @@ def main():
             print("First dioganal: " + str(round(scaled_diogan_1, 2)))
             print("Second dioganal: " + str(round(scaled_diogan_2, 2)))
             
-            # Contour area
-            # c = np.expand_dims(coords.astype(np.float32), 1)
-            # # Convert it to UMat object 
-            # c = cv2.UMat(c)
-            # area = cv2.contourArea(c)
-            # print("Area of contour: " + str(area))
             area_list.append(area)
-    print(area_list)
     area_diff = str(abs(area_list[0]-area_list[1]))
     print(area_diff + "mm2 - Area Differnce" )
         
