@@ -37,7 +37,6 @@ def main():
     ax.set_title("Polyimide Silicium 50 gramm pressure", fontsize = 20)
 
     contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
-
     area_list = []
 
     for contour in contours_1:
@@ -50,10 +49,10 @@ def main():
             diogan_1 = math.sqrt(math.pow(coords[0][0]-coords[2][0],2) + math.pow(coords[0][1]-coords[2][1], 2))
             diogan_2 = math.sqrt(math.pow(coords[1][0]-coords[3][0],2) + math.pow(coords[1][1]-coords[3][1], 2))
             
-            # Scale 6mm around 833 pixels
+            # Scale 6mkm around 833 pixels
             scale = 833
 
-            # Scale length in mm
+            # Scale length in mkm
             scale_length = 6
 
             # Rounding with two decimals
@@ -64,10 +63,26 @@ def main():
             area = scaled_diogan_1*scaled_diogan_1/2
             print("First dioganal: " + str(round(scaled_diogan_1, 2)))
             print("Second dioganal: " + str(round(scaled_diogan_2, 2)))
+            print(area)
+            # P - Pressure
+            P = 0.05 * 9.82/(scaled_diogan_1 * scaled_diogan_2) * 2
+
+            H = 1.854 * P / (scaled_diogan_1 * scaled_diogan_2)
+            print(round(H,3))
             
             area_list.append(area)
-    area_diff = str(abs(area_list[0]-area_list[1]))
-    print(area_diff + "mm2 - Area Differnce" )
+            
+            # Measuring area by cv2 with Grins algorithm
+            c = np.expand_dims(contour.astype(np.float32), 1)
+            # Convert it to UMat object
+            c = cv2.UMat(c)
+            area_c = cv2.contourArea(c)
+            print("OpenCV measured area: ", area_c)
+    
+    
+    area_diff = str(round(abs(area_list[0]-area_list[1]),2))
+    print(area_diff + " mkm2 - Area Differnce")
+    # mkm напряжение сжатия
         
     fig.tight_layout()
 
@@ -76,5 +91,3 @@ if __name__=="__main__":
     main()
     print("---Execution %s seconds ---" % round(time.time() - start_time))
     plt.show()
-    
-# npImage.save('/home/ububntu/Desktop/Diploma/squrePatterns/image_test.png')

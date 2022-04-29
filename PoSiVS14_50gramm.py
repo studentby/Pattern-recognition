@@ -50,12 +50,8 @@ def main():
     footprint_1 = morphology.disk(5)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
 
-    # Detecting Edges 
-    edges = feature.canny(grayscale_image - res, sigma = 1)
-    edges1 = feature.canny(grayscale_image_1 - res_1, sigma = 2)
-
     # Image rendition
-    ax[1].imshow(edges, cmap=plt.cm.gray)
+    ax[1].imshow(original_image_1, cmap=plt.cm.gray)
     ax[0].imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
 
 
@@ -71,8 +67,8 @@ def main():
 
     for contour in contours_1:
         coords = approximate_polygon(contour, tolerance = 60)
-        ax[0].plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
-        ax[0].plot(contour[:, 1], contour[:, 0], linewidth = 2)
+        # ax[0].plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
+        # ax[0].plot(contour[:, 1], contour[:, 0], linewidth = 2)
         if len(coords) == 4:
             print(coords)
             # coords[x][y]
