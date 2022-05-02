@@ -29,14 +29,15 @@ def main():
     # Removal of small objects from Image
     footprint_1 = morphology.disk(5)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
+    filtered_image = grayscale_image_1 - res_1
 
     # Image rendition
-    ax.imshow(grayscale_image_1 - res_1, cmap=plt.cm.gray)
+    ax.imshow(filtered_image, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
     ax.set_title("Polyimide Silicium 50 gramm pressure", fontsize = 20)
 
-    contours_1 = find_contours(grayscale_image_1 - res_1, fully_connected='high')
+    contours_1 = find_contours(filtered_image, fully_connected='high')
     area_list = []
 
     for contour in contours_1:
@@ -85,7 +86,7 @@ def main():
     # mkm напряжение сжатия
         
     fig.tight_layout()
-
+    
 if __name__=="__main__":
     start_time = time.time()
     main()
