@@ -1,3 +1,4 @@
+from cmath import pi
 import matplotlib.pyplot as plt
 import time
 from tkinter import Image
@@ -9,13 +10,15 @@ import math
 
 from skimage.color import rgb2gray
 from skimage import morphology, filters
+from skimage.transform import hough_circle, hough_circle_peaks
+from skimage.draw import circle_perimeter
 from skimage.measure import find_contours
-from skimage import feature
+from skimage import feature, data, color
 import numpy as np
 
 
 def oreol():
-
+    print(pi)
     original_image_1 = Image.open("PiSi/PiSi50.jpg")
 
     # Grayscaling and comparison of original image in MatPlot Lib 
@@ -29,18 +32,41 @@ def oreol():
     footprint_1 = morphology.disk(15)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
     filtered_image = grayscale_image_1 - res_1
+    gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), cv2.BORDER_DEFAULT)
 
     # Let's find oreol
-    edges = feature.canny(filtered_image, sigma=3, low_threshold=0.001, high_threshold=0.01)
-    # contours = find_contours(edges, fully_connected='low')
+    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
+    
+    hough_radii = np.arange(400, 1000, 100)
+    hough_res = hough_circle(edges, hough_radii)
 
-    # for contour in contours:
-    #     ax.plot(contour[:, 1], contour[:, 0], linewidth = 2)
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=7, min_xdistance=50, min_ydistance=50)
+    image = color.gray2rgb(gaussian_filter)
+
+    radii_list = []
+    for center_y, center_x, radius in zip(cy, cx, radii):
+        circy, circx = circle_perimeter(center_y, center_x, radius,
+                                        shape=image.shape)
+        image[circy, circx] = (250, 0, 0) # Circle color (R, G, B)
+        radii_list.append(radius)
+    ax.imshow(image, cmap=plt.cm.gray)
+    ax.set_title('Oreol measurement', fontsize=20)
+
+    # Finding average radii from list
+    avg_radius = np.median(radii_list)
+    print(avg_radius)
+
+    # Scale 6mkm around 833 pixels for PiSi50
+    scale = 833
+
+    # Scale length in mkm
+    scale_length = 6
 
 
-    ax.imshow(edges, cmap='gray')
-    ax.set_title('Canny filter', fontsize=20)
-
+    avg_radius = avg_radius/scale*scale_length
+    # Oreol area in pixels
+    oreoll_area = pi * avg_radius * avg_radius
+    print(oreoll_area)
 
     fig.tight_layout()
     plt.show()

@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
+from cmath import pi
 import time
 from tkinter import Image
 from PIL import Image
 from pyparsing import line_end
-from skimage.draw import line
+from skimage.draw import circle_perimeter
 import cv2
 import math
 
@@ -13,6 +14,7 @@ from skimage.segmentation import active_contour
 from skimage.measure import find_contours, approximate_polygon, perimeter
 from skimage.future import graph
 from skimage import color, morphology, feature, segmentation, filters, io
+from skimage.transform import hough_circle, hough_circle_peaks
 import numpy as np
 
 
@@ -30,14 +32,15 @@ def main():
     footprint_1 = morphology.disk(5)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
     filtered_image = grayscale_image_1 - res_1
+    gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), 0)
 
     # Image rendition
-    ax.imshow(filtered_image, cmap=plt.cm.gray)
+    ax.imshow(gaussian_filter, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
     ax.set_title("Polyimide Silicium 50 gramm pressure", fontsize = 20)
 
-    contours_1 = find_contours(filtered_image, fully_connected='high')
+    contours_1 = find_contours(gaussian_filter, fully_connected='high')
     area_list = []
 
     for contour in contours_1:
@@ -54,22 +57,25 @@ def main():
             scale = 833
 
             # Scale length in mkm
-            scale_length = 6
+            scale_length = 20
 
             # Rounding with two decimals
             scaled_diogan_1 = diogan_1/scale*scale_length
             scaled_diogan_2 = diogan_2/scale*scale_length
 
             # Area by diogonals and diveded by two
+
             area = scaled_diogan_1*scaled_diogan_1/2
+            
             print("First dioganal: " + str(round(scaled_diogan_1, 2)))
             print("Second dioganal: " + str(round(scaled_diogan_2, 2)))
             print(area)
-            # P - Pressure
-            P = 0.05 * 9.82/(scaled_diogan_1 * scaled_diogan_2) * 2
+
+            # P - gramm pressure
+            P = 50
 
             H = 1.854 * P / (scaled_diogan_1 * scaled_diogan_2)
-            print(round(H,3))
+            print("H: " + str(round(H,3)))
             
             area_list.append(area)
             
@@ -83,8 +89,37 @@ def main():
     
     area_diff = str(round(abs(area_list[0]-area_list[1]),2))
     print(area_diff + " mkm2 - Area Differnce")
-    # mkm напряжение сжатия
-        
+    
+    ## Let's find oreol 
+    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
+    
+    hough_radii = np.arange(400, 800, 50)
+    hough_res = hough_circle(edges, hough_radii)
+
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=2, min_xdistance=150, min_ydistance=150)
+    image = color.gray2rgb(gaussian_filter)
+
+    radii_list = []
+    for center_y, center_x, radius in zip(cy, cx, radii):
+        circy, circx = circle_perimeter(center_y, center_x, radius,
+                                        shape=image.shape)
+        image[circy, circx] = (250, 0, 0) # Circle color (R, G, B)
+        print("Found Radius oreol: " + str(radius) + " pixels")
+        radii_list.append(radius)
+    ax.imshow(image, cmap=plt.cm.gray)
+
+    # Finding average radii from list
+    avg_radius = np.median(radii_list)
+    print(avg_radius)
+
+    avg_radius = avg_radius/scale*scale_length
+    # Oreol area in pixels
+    oreoll_area = pi * avg_radius * avg_radius
+    print(oreoll_area)
+
+
+
+
     fig.tight_layout()
     
 if __name__=="__main__":
