@@ -18,7 +18,6 @@ import numpy as np
 
 
 def oreol():
-    print(pi)
     original_image_1 = Image.open("PiSi/PiSi50.jpg")
 
     # Grayscaling and comparison of original image in MatPlot Lib 
