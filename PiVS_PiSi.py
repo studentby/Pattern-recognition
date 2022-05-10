@@ -34,45 +34,47 @@ def main():
     filtered_image = grayscale_image_1 - res_1
     gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), 0)
 
+    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
     # Image rendition
-    ax.imshow(gaussian_filter, cmap=plt.cm.gray)
+    # ax.imshow(gaussian_filter, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
     ax.set_title("Polyimide Silicium 50 gramm pressure", fontsize = 20)
 
-    contours_1 = find_contours(gaussian_filter, fully_connected='high')
+    contours_1 = find_contours(gaussian_filter, fully_connected='low', positive_orientation='low')
     area_list = []
+
+    # Scale 6mkm around 833 pixels
+    scale = 833
+
+    # Scale length in mk metters 
+    scale_length = math.pow(5,-6)
 
     for contour in contours_1:
         coords = approximate_polygon(contour, tolerance = 60)
-        ax.plot(coords[:, 1], coords[:, 0], '-r', linewidth = 1)
-        ax.plot(contour[:, 1], contour[:, 0], linewidth = 2)
+        ax.plot(coords[:, 1], coords[:, 0], '-r', linewidth = 2)
+        ax.plot(contour[:, 1], contour[:, 0], linewidth = 1)
         if len(coords) == 5:
             
             # Dioganals of squares
             diogan_1 = math.sqrt(math.pow(coords[0][0]-coords[2][0],2) + math.pow(coords[0][1]-coords[2][1], 2))
             diogan_2 = math.sqrt(math.pow(coords[1][0]-coords[3][0],2) + math.pow(coords[1][1]-coords[3][1], 2))
             
-            # Scale 6mkm around 833 pixels
-            scale = 833
-
-            # Scale length in mkm
-            scale_length = 20
 
             # Rounding with two decimals
-            scaled_diogan_1 = diogan_1/scale*scale_length
-            scaled_diogan_2 = diogan_2/scale*scale_length
+            scaled_diogan_1 = scale_length * diogan_1/scale
+            scaled_diogan_2 = scale_length * diogan_2/scale
 
             # Area by diogonals and diveded by two
 
             area = scaled_diogan_1*scaled_diogan_1/2
-            
-            print("First dioganal: " + str(round(scaled_diogan_1, 2)))
-            print("Second dioganal: " + str(round(scaled_diogan_2, 2)))
-            print(area)
 
-            # P - gramm pressure
-            P = 50
+            print("First dioganal: " + str(scaled_diogan_1))
+            print("Second dioganal: " + str(scaled_diogan_2))
+            print("Found Area of polygone: " + str(area))
+
+            # P - gramm pressure (нагрузка)
+            P = 50 * math.pow(10,-3)
 
             H = 1.854 * P / (scaled_diogan_1 * scaled_diogan_2)
             print("H: " + str(round(H,3)))
@@ -86,14 +88,13 @@ def main():
             area_c = cv2.contourArea(c)
             print("OpenCV measured area: ", area_c)
     
-    
-    area_diff = str(round(abs(area_list[0]-area_list[1]),2))
-    print(area_diff + " mkm2 - Area Differnce")
+    if len(area_list) != 0:
+        area_diff = str((abs(area_list[0]-area_list[1]),2))
+        print(area_diff + " mkm2 - Area Differnce")
     
     ## Let's find oreol 
-    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
     
-    hough_radii = np.arange(400, 800, 50)
+    hough_radii = np.arange(100, 900, 50)
     hough_res = hough_circle(edges, hough_radii)
 
     accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=2, min_xdistance=150, min_ydistance=150)
@@ -104,21 +105,18 @@ def main():
         circy, circx = circle_perimeter(center_y, center_x, radius,
                                         shape=image.shape)
         image[circy, circx] = (250, 0, 0) # Circle color (R, G, B)
-        print("Found Radius oreol: " + str(radius) + " pixels")
+        # print("Found Radius oreol: " + str(radius) + " pixels")
         radii_list.append(radius)
     ax.imshow(image, cmap=plt.cm.gray)
 
     # Finding average radii from list
-    avg_radius = np.median(radii_list)
-    print(avg_radius)
+    median_radius = np.median(radii_list)
+    print("Median radius: " + str(median_radius))
 
-    avg_radius = avg_radius/scale*scale_length
+    median_radius_scaled = median_radius/scale*scale_length
     # Oreol area in pixels
-    oreoll_area = pi * avg_radius * avg_radius
-    print(oreoll_area)
-
-
-
+    oreoll_area = pi * median_radius_scaled * median_radius_scaled
+    print("Oreol area: " + str(oreoll_area))
 
     fig.tight_layout()
     
