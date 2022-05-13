@@ -20,7 +20,7 @@ import numpy as np
 
 def main():
 
-    original_image_1 = Image.open("PiSi/PiSi50.jpg")
+    original_image_1 = Image.open("PiSi/PiSi20.jpg")
 
     # Grayscaling and comparison of original image in MatPlot Lib 
     grayscale_image_1 = rgb2gray(original_image_1)
@@ -29,19 +29,19 @@ def main():
     fig, ax = plt.subplots(figsize=(8, 4))
 
     # Removal of small objects from Image
-    footprint_1 = morphology.disk(5)
+    footprint_1 = morphology.disk(3)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
     filtered_image = grayscale_image_1 - res_1
     gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), 0)
 
-    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
+    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.05, high_threshold=0.06)
     # Image rendition
     # ax.imshow(gaussian_filter, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
-    ax.set_title("Polyimide Silicium 50 gramm pressure", fontsize = 20)
+    ax.set_title("Pattern Recognition", fontsize = 20)
 
-    contours_1 = find_contours(gaussian_filter, fully_connected='low', positive_orientation='low')
+    contours_1 = find_contours(gaussian_filter, fully_connected='high', positive_orientation='high')
     area_list = []
 
     # Scale 6mkm around 833 pixels
@@ -51,7 +51,7 @@ def main():
     scale_length = math.pow(5,-6)
 
     for contour in contours_1:
-        coords = approximate_polygon(contour, tolerance = 60)
+        coords = approximate_polygon(contour, tolerance = 50)
         ax.plot(coords[:, 1], coords[:, 0], '-r', linewidth = 2)
         ax.plot(contour[:, 1], contour[:, 0], linewidth = 1)
         if len(coords) == 5:
@@ -94,17 +94,17 @@ def main():
     
     ## Let's find oreol 
     
-    hough_radii = np.arange(100, 900, 50)
+    hough_radii = np.arange(150, 900, 50)
     hough_res = hough_circle(edges, hough_radii)
 
-    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=2, min_xdistance=150, min_ydistance=150)
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=2, min_xdistance=100, min_ydistance=100)
     image = color.gray2rgb(gaussian_filter)
 
     radii_list = []
     for center_y, center_x, radius in zip(cy, cx, radii):
         circy, circx = circle_perimeter(center_y, center_x, radius,
                                         shape=image.shape)
-        image[circy, circx] = (250, 0, 0) # Circle color (R, G, B)
+        image[circy, circx] = (0, 0, 250) # Circle color (R, G, B)
         # print("Found Radius oreol: " + str(radius) + " pixels")
         radii_list.append(radius)
     ax.imshow(image, cmap=plt.cm.gray)
@@ -123,5 +123,5 @@ def main():
 if __name__=="__main__":
     start_time = time.time()
     main()
-    print("---Execution %s seconds ---" % round(time.time() - start_time))
+    print("--- Execution %s seconds ---" % round(time.time() - start_time))
     plt.show()
