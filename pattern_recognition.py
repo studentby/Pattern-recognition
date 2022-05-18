@@ -6,7 +6,7 @@ from tkinter import Image
 from PIL import Image
 from pyparsing import line_end
 from skimage.draw import circle_perimeter
-import cv2
+# import cv2
 import math
 import argparse
 
@@ -86,11 +86,11 @@ def main():
             
             area_list.append(area)            
             # Measuring area by cv2 with Grins algorithm
-            c = np.expand_dims(contour.astype(np.float32), 1)
-            # Convert it to UMat object
-            c = cv2.UMat(c)
-            area_c = cv2.contourArea(c)
-            print("OpenCV measured area: ", area_c)
+            # c = np.expand_dims(contour.astype(np.float32), 1)
+            # # Convert it to UMat object
+            # c = cv2.UMat(c)
+            # area_c = cv2.contourArea(c)
+            # print("OpenCV measured area: ", area_c)
     
     if len(area_list) != 0:
         area_diff = str((abs(area_list[0]-area_list[1]),2))
