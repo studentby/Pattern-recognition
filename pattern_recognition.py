@@ -1,3 +1,4 @@
+from html import parser
 import matplotlib.pyplot as plt
 from cmath import pi
 import time
@@ -7,6 +8,7 @@ from pyparsing import line_end
 from skimage.draw import circle_perimeter
 import cv2
 import math
+import argparse
 
 from skimage.color import rgb2gray
 from skimage.filters import gaussian
@@ -17,10 +19,16 @@ from skimage import color, morphology, feature, segmentation, filters, io
 from skimage.transform import hough_circle, hough_circle_peaks
 import numpy as np
 
+parser = argparse.ArgumentParser()
 
+path = parser.add_argument("--path", "--p", help="path to image", default="PiSi/PiSi50.jpg")
+scale = parser.add_argument("--scale", "--sc", help="lenght of a single scale in pixels", default=833)
+length = parser.add_argument("--length", "--l", help="length of a single scale in mkm", default=5)
+
+args = parser.parse_args()
 def main():
 
-    original_image_1 = Image.open("PiSi/PiSi20.jpg")
+    original_image_1 = Image.open(args.path)
 
     # Grayscaling and comparison of original image in MatPlot Lib 
     grayscale_image_1 = rgb2gray(original_image_1)
@@ -34,7 +42,7 @@ def main():
     filtered_image = grayscale_image_1 - res_1
     gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), 0)
 
-    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.05, high_threshold=0.06)
+    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
     # Image rendition
     # ax.imshow(gaussian_filter, cmap=plt.cm.gray)
 
@@ -44,11 +52,8 @@ def main():
     contours_1 = find_contours(gaussian_filter, fully_connected='high', positive_orientation='high')
     area_list = []
 
-    # Scale 6mkm around 833 pixels
-    scale = 833
-
     # Scale length in mk metters 
-    scale_length = math.pow(5,-6)
+    scale_length = math.pow(int(args.length), -6)
 
     for contour in contours_1:
         coords = approximate_polygon(contour, tolerance = 50)
@@ -62,8 +67,8 @@ def main():
             
 
             # Rounding with two decimals
-            scaled_diogan_1 = scale_length * diogan_1/scale
-            scaled_diogan_2 = scale_length * diogan_2/scale
+            scaled_diogan_1 = scale_length * diogan_1/args.scale
+            scaled_diogan_2 = scale_length * diogan_2/args.scale
 
             # Area by diogonals and diveded by two
 
@@ -79,8 +84,7 @@ def main():
             H = 1.854 * P / (scaled_diogan_1 * scaled_diogan_2)
             print("H: " + str(round(H,3)))
             
-            area_list.append(area)
-            
+            area_list.append(area)            
             # Measuring area by cv2 with Grins algorithm
             c = np.expand_dims(contour.astype(np.float32), 1)
             # Convert it to UMat object
@@ -94,7 +98,7 @@ def main():
     
     ## Let's find oreol 
     
-    hough_radii = np.arange(150, 900, 50)
+    hough_radii = np.arange(300, 900, 100)
     hough_res = hough_circle(edges, hough_radii)
 
     accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=2, min_xdistance=100, min_ydistance=100)
@@ -113,7 +117,7 @@ def main():
     median_radius = np.median(radii_list)
     print("Median radius: " + str(median_radius))
 
-    median_radius_scaled = median_radius/scale*scale_length
+    median_radius_scaled = median_radius/args.scale*scale_length
     # Oreol area in pixels
     oreoll_area = pi * median_radius_scaled * median_radius_scaled
     print("Oreol area: " + str(oreoll_area))
