@@ -22,8 +22,8 @@ import numpy as np
 def userInput():
 
     userInput.path = input("Enter image full path: ")
-    userInput.scale = input ("Scale number in pixels: ")
-    userInput.length = input("Length of a single scale: ")
+    userInput.scale = int(input ("Scale number in pixels: "))
+    userInput.length = int(input("Length of a single scale: "))
 
 def main():
 
