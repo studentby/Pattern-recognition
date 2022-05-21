@@ -28,7 +28,7 @@ def userInput():
 def main():
 
     userInput()
-    
+
     original_image_1 = Image.open(userInput.path)
 
     # Grayscaling and comparison of original image in MatPlot Lib 
@@ -44,8 +44,6 @@ def main():
     gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), 0)
 
     edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
-    # Image rendition
-    # ax.imshow(gaussian_filter, cmap=plt.cm.gray)
 
     ax.set_xticks([]), ax.set_yticks([])
     ax.set_title("Pattern Recognition", fontsize = 20)
@@ -86,12 +84,6 @@ def main():
             print("H: " + str(round(H,3)))
             
             area_list.append(area)            
-            # Measuring area by cv2 with Grins algorithm
-            # c = np.expand_dims(contour.astype(np.float32), 1)
-            # # Convert it to UMat object
-            # c = cv2.UMat(c)
-            # area_c = cv2.contourArea(c)
-            # print("OpenCV measured area: ", area_c)
     
     if len(area_list) != 0:
         area_diff = str((abs(area_list[0]-area_list[1]),2))
