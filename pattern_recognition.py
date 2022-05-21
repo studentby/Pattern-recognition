@@ -6,7 +6,7 @@ from tkinter import Image
 from PIL import Image
 from pyparsing import line_end
 from skimage.draw import circle_perimeter
-# import cv2
+import cv2
 import math
 import argparse
 
@@ -19,16 +19,17 @@ from skimage import color, morphology, feature, segmentation, filters, io
 from skimage.transform import hough_circle, hough_circle_peaks
 import numpy as np
 
-parser = argparse.ArgumentParser()
+def userInput():
 
-path = parser.add_argument("--path", "--p", help="path to image", default="PiSi/PiSi50.jpg")
-scale = parser.add_argument("--scale", "--sc", help="lenght of a single scale in pixels", default=833)
-length = parser.add_argument("--length", "--l", help="length of a single scale in mkm", default=5)
+    userInput.path = input("Enter image full path: ")
+    userInput.scale = input ("Scale number in pixels: ")
+    userInput.length = input("Length of a single scale: ")
 
-args = parser.parse_args()
 def main():
 
-    original_image_1 = Image.open(args.path)
+    userInput()
+    
+    original_image_1 = Image.open(userInput.path)
 
     # Grayscaling and comparison of original image in MatPlot Lib 
     grayscale_image_1 = rgb2gray(original_image_1)
@@ -53,7 +54,7 @@ def main():
     area_list = []
 
     # Scale length in mk metters 
-    scale_length = math.pow(int(args.length), -6)
+    scale_length = math.pow(int(userInput.length), -6)
 
     for contour in contours_1:
         coords = approximate_polygon(contour, tolerance = 50)
@@ -67,8 +68,8 @@ def main():
             
 
             # Rounding with two decimals
-            scaled_diogan_1 = scale_length * diogan_1/args.scale
-            scaled_diogan_2 = scale_length * diogan_2/args.scale
+            scaled_diogan_1 = scale_length * diogan_1/userInput.scale
+            scaled_diogan_2 = scale_length * diogan_2/userInput.scale
 
             # Area by diogonals and diveded by two
 
@@ -117,7 +118,7 @@ def main():
     median_radius = np.median(radii_list)
     print("Median radius: " + str(median_radius))
 
-    median_radius_scaled = median_radius/args.scale*scale_length
+    median_radius_scaled = median_radius/userInput.scale*scale_length
     # Oreol area in pixels
     oreoll_area = pi * median_radius_scaled * median_radius_scaled
     print("Oreol area: " + str(oreoll_area))
