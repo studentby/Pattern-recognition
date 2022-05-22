@@ -1,29 +1,26 @@
-from html import parser
 import matplotlib.pyplot as plt
 from cmath import pi
 import time
-from tkinter import Image
 from PIL import Image
-from pyparsing import line_end
 from skimage.draw import circle_perimeter
 import cv2
 import math
-import argparse
 
 from skimage.color import rgb2gray
-from skimage.filters import gaussian
-from skimage.segmentation import active_contour
-from skimage.measure import find_contours, approximate_polygon, perimeter
-from skimage.future import graph
-from skimage import color, morphology, feature, segmentation, filters, io
+from skimage.measure import find_contours, approximate_polygon
+from skimage import color, morphology
+from skimage.feature import canny
 from skimage.transform import hough_circle, hough_circle_peaks
 import numpy as np
 
 def userInput():
 
-    userInput.path = input("Enter image full path: ")
-    userInput.scale = int(input ("Scale number in pixels: "))
-    userInput.length = int(input("Length of a single scale: "))
+    # userInput.path = input("Enter image full path: ")
+    # userInput.scale = int(input ("Scale number in pixels: "))
+    # userInput.length = int(input("Length of a single scale: "))
+    userInput.path = "C:/Users/Ayhan_Gylychmammedov/Desktop/Learn/little_projects/Pattern-recognition/PiSi/PiSi50.jpg"
+    userInput.scale = int(833)
+    userInput.length = int(5)
 
 def main():
 
@@ -43,7 +40,7 @@ def main():
     filtered_image = grayscale_image_1 - res_1
     gaussian_filter = cv2.GaussianBlur(filtered_image, (17,19), 0)
 
-    edges = feature.canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
+    edges = canny(gaussian_filter, sigma=3, low_threshold=0.01, high_threshold=0.02)
 
     ax.set_xticks([]), ax.set_yticks([])
     ax.set_title("Pattern Recognition", fontsize = 20)
@@ -102,7 +99,6 @@ def main():
         circy, circx = circle_perimeter(center_y, center_x, radius,
                                         shape=image.shape)
         image[circy, circx] = (0, 0, 250) # Circle color (R, G, B)
-        # print("Found Radius oreol: " + str(radius) + " pixels")
         radii_list.append(radius)
     ax.imshow(image, cmap=plt.cm.gray)
 
