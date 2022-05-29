@@ -19,7 +19,7 @@ def userInput():
     # userInput.scale = int(input ("Scale number in pixels: "))
     # userInput.length = int(input("Length of a single scale: "))
     userInput.path = "PiSi/PiSi5.jpg"
-    userInput.scale = int(833)
+    userInput.scale = int(620)
     userInput.length = int(5)
 
 def main():
@@ -36,15 +36,15 @@ def main():
     footprint_1 = morphology.disk(3)
     res_1 = morphology.white_tophat(grayscale_image_1, footprint_1)
     filtered_image = grayscale_image_1 - res_1
-    gaussian_filter = gaussian(filtered_image, sigma=4, preserve_range=False)
+    gaussian_filter = gaussian(filtered_image, sigma=40, preserve_range=False)
 
     # Detect possible edges
-    edges = feature.canny(gaussian_filter, sigma=1, low_threshold=0.000001, high_threshold=0.000009)
+    edges = feature.canny(gaussian_filter, sigma=1, low_threshold=0.00001, high_threshold=0.00009)
 
     ax.set_xticks([]),  ax.set_yticks([])
     ax.set_title("Pattern Recognition", fontsize = 20)
 
-    contours_1 = find_contours(gaussian_filter, fully_connected='high', positive_orientation='high')
+    contours_1 = find_contours(edges, fully_connected='high', positive_orientation='high')
     area_list = []
 
     # Scale length in mk metters 
